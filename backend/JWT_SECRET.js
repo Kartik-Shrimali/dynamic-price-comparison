@@ -1,1 +1,1 @@
-export const JWT_SECRET = "DBMS"
+module.exports = { JWT_SECRET : "DBMS"}
