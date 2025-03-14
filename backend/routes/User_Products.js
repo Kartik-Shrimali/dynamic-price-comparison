@@ -3,8 +3,9 @@ const router = express.Router();
 const pool = require("../db")
 const { JWT_SECRET } = require("../JWT_SECRET")
 const jwt = require("jsonwebtoken");
+const authMiddleware = require("../middleware")
 
-router.get("/", async (req, res) => {
+router.get("/", authMiddleware , async (req, res) => {
     try {
         const Pid = parseInt(req.query.id);
 
@@ -39,5 +40,18 @@ router.get("/", async (req, res) => {
         })
     }
 })
+
+router.get("/prices" , authMiddleware , async (req , res)=>{
+    // const ProductId = parseInt(req.query.id);
+
+    // if(!ProductId){
+    //     return res.json({
+    //         msg : "provide a product id"
+    //     })
+    // }
+
+    // await pool.query("SELECT ")
+})
+
 
 module.exports = router
