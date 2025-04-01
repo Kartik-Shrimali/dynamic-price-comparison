@@ -10,7 +10,6 @@ Router.use("/shopkeeper" , ShopkeeperPages);
 Router.use("/user/products" ,User_Products );
 Router.use("/user/alerts" ,user_Alerts);
 
-module.exports = {
-    Router
-}
+module.exports =  Router
+
 
