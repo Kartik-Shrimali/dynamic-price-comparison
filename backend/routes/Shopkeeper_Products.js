@@ -182,7 +182,23 @@ router.delete("/delete", authMiddleware, async (req, res) => {
 router.get("/products", authMiddleware, async (req, res) => {
     const store_id = req.user.id;
     try{
+        const [products] = await pool.query(`
+            SELECT products.id, products.name, products.brand, products.category, 
+                   prices.price, 
+                   availability.available
+            FROM products
+            LEFT JOIN prices ON products.id = prices.product_id AND prices.store_id = ?
+            LEFT JOIN availability ON products.id = availability.product_id AND availability.store_id = ?
+            WHERE prices.store_id IS NOT NULL OR availability.store_id IS NOT NULL
+        `, [store_id, store_id]);
+        
+        if(products.length === 0){
+            return res.status(404).json({
+                msg: "No products found"
+            })
+        }
 
+        return res.status(200).json(products);
     }catch(err){
         return res.status(500).json({
             msg: "There was some internal server error",
