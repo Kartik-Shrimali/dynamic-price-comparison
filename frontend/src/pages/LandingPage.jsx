@@ -14,7 +14,7 @@ export function LandingPage() {
                     <Button input="Signup as User" color="blue"></Button>
                 </Link>
                 <Link to="/signup/store">
-                    <Button input="Signup as Storekeeper" color="green"></Button>
+                    <Button input="Signup as Shopkeeper" color="green"></Button>
                 </Link>
             </div>
 
