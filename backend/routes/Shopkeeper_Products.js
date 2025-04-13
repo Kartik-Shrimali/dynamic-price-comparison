@@ -179,7 +179,7 @@ router.delete("/delete", authMiddleware, async (req, res) => {
     }
 })
 
-router.get("/products", authMiddleware, async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
     const store_id = req.user.id;
     try{
         const [products] = await pool.query(`

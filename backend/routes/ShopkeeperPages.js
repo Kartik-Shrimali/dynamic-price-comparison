@@ -16,12 +16,12 @@ router.post("/signup", async (req, res) => {
 
     try {
         const shopname = req.body.shopname;
-        const email = req.body.email;
+        const email = req.body.email; 
         const password = req.body.password;
         const rating = req.body.rating;
         const delivery_time_days = req.body.delivery_time_days;
 
-        const [shopexists] = await pool.query("SELECT id FROM stores WHERE email = ?", [email]);
+        const [shopexists] = await pool.query("SELECT id FROM stores WHERE name = ?", [shopname]);
 
         if (shopexists.length > 0) {
             return res.status(400).json({
@@ -39,7 +39,7 @@ router.post("/signup", async (req, res) => {
 
         const storeId = stores.insertId;
 
-        const token = jwt.sign({ id: storeId, email: email }, JWT_SECRET);
+        const token = jwt.sign({ id: storeId, email: shopname }, JWT_SECRET);
 
         return res.status(200).json({
             msg: "Signup successful",
@@ -67,10 +67,10 @@ router.post("/signin", async (req, res) => {
     }
 
     try {
-        const email = req.body.email;
+        const shopname = req.body.shopname;
         const password = req.body.password;
 
-        const [existingStore] = await pool.query("SELECT * FROM stores WHERE email = ? AND password = ?", [email, password]);
+        const [existingStore] = await pool.query("SELECT * FROM stores WHERE name = ? AND password = ?", [shopname, password]);
 
         if (existingStore.length === 0) {
             return res.status(400).json({
@@ -79,7 +79,7 @@ router.post("/signin", async (req, res) => {
         }
 
         const store = existingStore[0];
-        const token = jwt.sign({ id: store.id, email: store.email }, JWT_SECRET);
+        const token = jwt.sign({ id: store.id, email: store.name }, JWT_SECRET);
 
         return res.status(200).json({
             msg: "Signin successful",

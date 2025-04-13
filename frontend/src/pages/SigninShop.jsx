@@ -1,11 +1,9 @@
-import { Input } from "../components/Input";
-import { Button } from "../components/Button"
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+ import { useNavigate } from "react-router-dom";
 
 export function SigninShop() {
-    const [email, setEmail] = useState("");
+    const [shopname, setShopname] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
@@ -17,14 +15,14 @@ export function SigninShop() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    email: email,
+                    shopname: shopname,
                     password: password
                 })
             })
 
             let data = await response.json();
 
-            if (response.ok) {
+            if (data.token) {
                 localStorage.setItem("token", data.token);
                 alert("Signin successful")
                 navigate("/dashboard/store")
@@ -44,18 +42,19 @@ export function SigninShop() {
 
             <div className="bg-white drop-shadow-md w-6/12 flex justify-center items-center flex-col p-6 rounded-lg">
                 <div className="text-3xl font-bold m-3">Sign In as Shopkeeper</div>
-                <Input placeholder="Enter your email" onChange={(e) => {
-                    setEmail(e.target.value)
-                }}></Input>
-                <Input placeholder="Enter your password" onChange={(e) => {
+                <input type = "text" placeholder = "Enter your shopname" className = "p-3 m-2 rounded-lg w-full border-gray-300 border-2 " onChange={(e) => {
+                    setShopname(e.target.value)
+                }}></input>                
+                <input type = "text" placeholder = "Enter your password" className = "p-3 m-2 rounded-lg w-full border-gray-300 border-2 " onChange={(e) => {
                     setPassword(e.target.value)
-                }}></Input>
+                }}></input>                
+                
 
-                <Button input="Signin" color="blue" onclick={handleSignin}></Button>
+                <button className={`bg-blue-600 w-full m-2 rounded-lg p-3 text-white font-bold text-xl`} onClick={handleSignin}>Signin</button>
 
 
                 <Link to="/signup/store">
-                    <Button input="Don't have an account ? Signup" color="green"></Button>
+                    <button className={`bg-green-600 w-full m-2 rounded-lg p-3 text-white font-bold text-xl`}>Don't have an account ? Signup</button>
                 </Link>
             </div>
 

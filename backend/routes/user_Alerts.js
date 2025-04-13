@@ -67,7 +67,7 @@ router.get("/", authMiddleware, async (req, res) => {
     const user_id = req.user.id
 
     try {
-        const [Alerts] = await pool.query("SELECT id , product_id , max_payable_amount from user_alerts WHERE user_id = ?", [user_id]);
+        const [Alerts] = await pool.query("SELECT id , product_id , max_payable_amount, notification_enabled from user_alerts WHERE user_id = ?", [user_id]);
         return res.status(200).json(Alerts);
 
     } catch (err) {

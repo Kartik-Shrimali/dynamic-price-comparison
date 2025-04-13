@@ -1,6 +1,5 @@
-import { Link, useNavigate } from "react-router-dom"
-import { Button } from "../components/Button"
-import { Input } from "../components/Input"
+import { Link, useNavigate } from "react-router-dom";
+
 import { useState } from "react"
 
 export function SignupUser() {
@@ -19,21 +18,21 @@ export function SignupUser() {
                 },
                 body: JSON.stringify({
                     name: name,
-                    email: email,
+                    email: email.trim(),
                     password: password
                 })
             })
 
             let data = await response.json();
 
-            if (response.ok) {
+            if (data.token) {
                 localStorage.setItem("token", data.token);
                 alert("Signup successful")
                 
                 navigate("/dashboard/user")
             }
             else {
-                alert(data.message || "Signup failed! Please try again.")
+                alert(data.msg || "Signup failed! Please try again.")
             }
         } catch (error) {
             alert("Network error! Please check your connection.")
@@ -48,19 +47,19 @@ export function SignupUser() {
             <div className="bg-white drop-shadow-md w-6/12 flex justify-center items-center flex-col p-6 rounded-lg">
                 <div className="text-3xl font-bold m-3">Sign Up as User</div>
 
-                <Input placeholder="Enter your name" onChange={(e) => {
+                <input type = "text" placeholder = "Enter your name" className = "p-3 m-2 rounded-lg w-full border-gray-300 border-2 " onChange={(e) => {
                     setName(e.target.value)
-                }}></Input>
-                <Input placeholder="Enter your email" onChange={(e) => {
+                }}></input>
+                <input type = "text" placeholder = "Enter your email" className = "p-3 m-2 rounded-lg w-full border-gray-300 border-2 " onChange={(e) => {
                     setEmail(e.target.value)
-                }}></Input>
-                <Input placeholder="Enter your password" onChange={(e) => {
+                }}></input>
+                <input type = "text" placeholder = "Enter your password" className = "p-3 m-2 rounded-lg w-full border-gray-300 border-2 " onChange={(e) => {
                     setPassword(e.target.value)
-                }}></Input>
-                <Button input="Signup" color="blue" onClick={handleSignup}></Button>
+                }}></input>
+                <button className={`bg-blue-600 w-full m-2 rounded-lg p-3 text-white font-bold text-xl`} onClick={handleSignup}>Signup</button>
 
                 <Link to="/signin/user">
-                    <Button input="Already have an account ? Signin" color="green"></Button>
+                    <button className={`bg-green-600 w-full m-2 rounded-lg p-3 text-white font-bold text-xl`}>Already have an account ? Signin</button>
                 </Link>
 
             </div>

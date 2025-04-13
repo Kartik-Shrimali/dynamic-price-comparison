@@ -10,6 +10,7 @@ import {DashboardUser} from "./pages/DashboardUser"
 import {SignupShop} from "./pages/SignupShop"
 import {SigninShop} from "./pages/SigninShop"
 import {DashboardStore} from "./pages/DashboardStore"
+import {PriceAlertsUser} from "./pages/PriceAlert"
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
           <Route path = "/signup/store" element={<SignupShop/>}/>
             <Route path = "/signin/store" element={<SigninShop/>}/>
           <Route path = "/dashboard/store" element={<DashboardStore/>}/>
+          <Route path = "/price-alert" element={<PriceAlertsUser/>}/>
 
         </Routes>
       </Router>

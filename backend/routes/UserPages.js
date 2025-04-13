@@ -48,20 +48,21 @@ router.post("/signup", async (req, res) => {
 })
 
 router.post("/signin", async (req, res) => {
-    const result = signinSchema.safeParse(req.body);
+    const email = req.body.email.trim();
+    const password = req.body.password;
+    const result = signinSchema.safeParse({email , password});
 
     if (!result.success) {
+        console.log(result.error)
         return res.status(400).json({
             msg: "You have put wrong inputs.Try again or signup"
         })
     }
-    const email = req.body.email;
-    const password = req.body.password;
 
     try {
-        const [existingUser] = await pool.query("SELECT id FROM users WHERE email = ? AND password = ?", [email, password]);
+        const [existingUser] = await pool.query("SELECT * FROM users WHERE email = ? AND password = ?", [email, password]); 
 
-        if (existingUser == 0) {
+        if (existingUser.length == 0) {
             return res.status(400).json({
                 msg: "user does not exist"
             })
