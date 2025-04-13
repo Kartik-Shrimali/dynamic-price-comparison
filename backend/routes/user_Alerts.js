@@ -106,6 +106,35 @@ router.delete("/delete", authMiddleware, async (req, res) => {
     }
 })
 
+
+// Add this route in the same user alerts route file
+router.put("/:id", authMiddleware, async (req, res) => {
+    const user_id = req.user.id;
+    const alert_id = req.params.id;
+    const { max_payable_amount, notification_enabled } = req.body;
+
+    try {
+        const [existing] = await pool.query("SELECT * FROM user_alerts WHERE id = ? AND user_id = ?", [alert_id, user_id]);
+
+        if (existing.length === 0) {
+            return res.status(404).json({ msg: "Alert not found" });
+        }
+
+        await pool.query(
+            "UPDATE user_alerts SET max_payable_amount = ?, notification_enabled = ? WHERE id = ? AND user_id = ?",
+            [max_payable_amount, notification_enabled, alert_id, user_id]
+        );
+
+        return res.status(200).json({ msg: "Alert updated successfully" });
+    } catch (err) {
+        return res.status(500).json({
+            msg: "Internal server error",
+            error: err.message,
+        });
+    }
+});
+
+
 router.get("/notification", authMiddleware, async (req, res) => {
     const user_id = req.user.id;
 

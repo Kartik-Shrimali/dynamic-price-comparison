@@ -10,7 +10,7 @@ import {DashboardUser} from "./pages/DashboardUser"
 import {SignupShop} from "./pages/SignupShop"
 import {SigninShop} from "./pages/SigninShop"
 import {DashboardStore} from "./pages/DashboardStore"
-import {PriceAlertsUser} from "./pages/PriceAlert"
+import {PriceAlertsUser} from "./pages/PriceAlertsUser" 
 
 function App() {
 

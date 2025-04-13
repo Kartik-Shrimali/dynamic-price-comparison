@@ -17,10 +17,9 @@ export function DashboardUser() {
       });
 
       const data = await res.json();
-      console.log("Fetched products:", data); // Log the response to verify the structure
 
       if (res.ok) {
-        setProducts(data); // Set the products array directly
+        setProducts(data); 
       } else {
         alert("Failed to fetch products");
       }
@@ -41,7 +40,7 @@ export function DashboardUser() {
       );
       const data = await res.json();
       if (res.ok) {
-        setPriceData(data); // Store the price data for the selected product
+        setPriceData(data); 
       } else {
         alert("Failed to fetch price comparison");
       }
