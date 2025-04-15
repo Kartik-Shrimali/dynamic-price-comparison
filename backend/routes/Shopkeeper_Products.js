@@ -11,64 +11,87 @@ router.post("/add", authMiddleware, async (req, res) => {
     const category = req.body.category;
     const price = parseFloat(req.body.price);
     const available = parseInt(req.body.available);
+
     try {
         if (!product_name || !brand || !category || isNaN(price) || isNaN(available) || price < 0 || available < 0) {
             return res.status(400).json({
                 msg: "Please provide all the inputs or check if inputs are valid"
-            })
+            });
         }
 
         const [productexists] = await pool.query(
-            "SELECT id FROM products WHERE name = ? AND brand = ? AND category = ? AND store_id = ?",
-            [product_name, brand, category, store_id]  // Make sure to pass the store_id as well
+            "SELECT id FROM products WHERE name = ? AND brand = ? AND category = ?", 
+            [product_name, brand, category]
         );
-        
+
+        let product_id;
 
         if (productexists.length > 0) {
-            return res.status(400).json({
-                msg: "Product already exists"
-            })
+            product_id = productexists[0].id;
+
+            const [storeAlreadyAdded] = await pool.query(
+                "SELECT * FROM prices WHERE product_id = ? AND store_id = ?",
+                [product_id, store_id]
+            );
+
+            if (storeAlreadyAdded.length > 0) {
+                return res.status(400).json({
+                    msg: "You have already added this product"
+                });
+            }
+        } else {
+            const [product] = await pool.query(
+                "INSERT INTO products(name , brand , category) VALUES(?,?,?)", 
+                [product_name, brand, category]
+            );
+
+            if (product.affectedRows === 0) {
+                return res.status(400).json({
+                    msg: "There was some error while inserting product"
+                });
+            }
+
+            product_id = product.insertId;
         }
 
-        const [product] = await pool.query("INSERT INTO products(name , brand , category, id) VALUES(?,?,?,?)", [product_name, brand, category, store_id]);
-
-        if (product.affectedRows === 0) {
-            return res.status(400).json({
-                msg: "There was some error while inserting product"
-            })
-        }
-
-        const [priceinsertion] = await pool.query("INSERT INTO prices(product_id , id , price) VALUES(?,?,?)", [product.insertId, store_id, price]);
+        const [priceinsertion] = await pool.query(
+            "INSERT INTO prices(product_id , store_id , price) VALUES(?,?,?)", 
+            [product_id, store_id, price]
+        );
 
         if (priceinsertion.affectedRows === 0) {
             return res.status(400).json({
                 msg: "There was some error while inserting price"
-            })
+            });
         }
 
-        const [availabilityinsertion] = await pool.query("INSERT INTO availability(product_id , id , available) VALUES(?,?,?)", [product.insertId, store_id, available]);
+        const [availabilityinsertion] = await pool.query(
+            "INSERT INTO availability(product_id , store_id , available) VALUES(?,?,?)", 
+            [product_id, store_id, available]
+        );
 
         if (availabilityinsertion.affectedRows === 0) {
             return res.status(400).json({
                 msg: "There was some error while inserting availability"
-            })
+            });
         }
 
         return res.status(200).json({
             msg: "Product added successfully"
-        })
+        });
 
     } catch (err) {
         return res.status(500).json({
             msg: "There was some internal server error",
             error: err.message
-        })
+        });
     }
-})
+});
 
-router.post("/update", authMiddleware, async (req, res) => {
+
+router.put("/update/:id", authMiddleware, async (req, res) => {
     const store_id = req.user.id;
-    const product_id = req.body.product_id;
+    const product_id = req.params.id;
     const price = parseFloat(req.body.price);
     const available = parseInt(req.body.available);
 
@@ -121,7 +144,7 @@ router.post("/update", authMiddleware, async (req, res) => {
             error: err.message
         })
     }
-})
+});
 
 router.delete("/delete", authMiddleware, async (req, res) => {
     const store_id = req.user.id;
@@ -181,27 +204,53 @@ router.delete("/delete", authMiddleware, async (req, res) => {
             error: err.message
         })
     }
-})
+});
 
 router.get("/", authMiddleware, async (req, res) => {
     const store_id = req.user.id;
+
     try {
-        const [products] = await pool.query(`
-            SELECT products.id, products.name, products.brand, products.category, 
-                   prices.price, 
-                   availability.available
-            FROM products
-            LEFT JOIN prices ON products.id = prices.product_id AND prices.store_id = ?
-            LEFT JOIN availability ON products.id = availability.product_id AND availability.store_id = ?
-            WHERE prices.store_id IS NOT NULL OR availability.store_id IS NOT NULL
-        `, [store_id, store_id]);
+        const [products] = await pool.query(
+            `SELECT products.id, products.name, products.brand, products.category, 
+                    prices.price, availability.available
+             FROM products
+             LEFT JOIN prices ON products.id = prices.product_id AND prices.store_id = ?
+             LEFT JOIN availability ON products.id = availability.product_id AND availability.store_id = ?
+             WHERE prices.store_id IS NOT NULL OR availability.store_id IS NOT NULL`,
+            [store_id, store_id]
+        );
 
         return res.status(200).json(products);
+
     } catch (err) {
         return res.status(500).json({ msg: "Internal server error", error: err.message });
     }
 });
 
+router.get("/:id", authMiddleware, async (req, res) => {
+  const store_id = req.user.id;
+  const product_id = req.params.id;
 
-module.exports = router
+  try {
+    const [productRows] = await pool.query(`
+      SELECT products.id, products.name, products.brand, products.category, 
+             prices.price, 
+             availability.available
+      FROM products
+      LEFT JOIN prices ON products.id = prices.product_id AND prices.store_id = ?
+      LEFT JOIN availability ON products.id = availability.product_id AND availability.store_id = ?
+      WHERE products.id = ?
+    `, [store_id, store_id, product_id]);
 
+    if (productRows.length === 0) {
+      return res.status(404).json({ msg: "Product not found" });
+    }
+
+    return res.status(200).json(productRows[0]);
+  } catch (err) {
+    return res.status(500).json({ msg: "Internal server error", error: err.message });
+  }
+});
+
+
+module.exports = router;

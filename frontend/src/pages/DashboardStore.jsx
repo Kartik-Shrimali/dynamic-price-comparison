@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -63,16 +64,17 @@ export function DashboardStore() {
     };
 
     const handleDelete = async (id) => {
-        const response = await fetch(`http://localhost:3000/api/v1/store/products/delete/${id}`, {
+        const response = await fetch(`http://localhost:3000/api/v1/store/products/delete`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
-            }
+            },
+            body: JSON.stringify({ id }) 
         });
-
+    
         const data = await response.json();
-
+    
         if (response.ok) {
             alert(data.msg);
             fetchProducts();
@@ -80,6 +82,7 @@ export function DashboardStore() {
             alert(data.msg || "Error deleting product");
         }
     };
+    
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -159,10 +162,10 @@ export function DashboardStore() {
                                     <td className="p-2">{product.brand}</td>
                                     <td className="p-2">{product.category}</td>
                                     <td className="p-2">₹{product.price || '-'}</td>
-                                    <td className="p-2">{product.available === 1 ? "Yes" : "No"}</td>  // Check for 1 or 0
+                                    <td className="p-2">{product.available === 1 ? "Yes" : "No"}</td> 
                                     <td className="p-2">
                                         <button
-                                            onClick={() => navigate(`/update-product/${product.id}`)}
+                                            onClick={() => navigate(`/update/${product.id}`)}
                                             className="bg-yellow-400 text-white px-2 py-1 rounded mr-2"
                                         >
                                             Edit
