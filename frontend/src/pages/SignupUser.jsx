@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react"
 
 export function SignupUser() {
-    const [name, setName] = useState("");
+    const [firstname, setFirstname] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
@@ -17,7 +17,7 @@ export function SignupUser() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    name: name,
+                    firstname: firstname,
                     email: email.trim(),
                     password: password
                 })
@@ -47,8 +47,8 @@ export function SignupUser() {
             <div className="bg-white drop-shadow-md w-6/12 flex justify-center items-center flex-col p-6 rounded-lg">
                 <div className="text-3xl font-bold m-3">Sign Up as User</div>
 
-                <input type = "text" placeholder = "Enter your name" className = "p-3 m-2 rounded-lg w-full border-gray-300 border-2 " onChange={(e) => {
-                    setName(e.target.value)
+                <input type = "text" placeholder = "Enter your firstname" className = "p-3 m-2 rounded-lg w-full border-gray-300 border-2 " onChange={(e) => {
+                    setFirstname(e.target.value)
                 }}></input>
                 <input type = "text" placeholder = "Enter your email" className = "p-3 m-2 rounded-lg w-full border-gray-300 border-2 " onChange={(e) => {
                     setEmail(e.target.value)

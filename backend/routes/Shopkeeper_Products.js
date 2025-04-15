@@ -18,7 +18,11 @@ router.post("/add", authMiddleware, async (req, res) => {
             })
         }
 
-        const [productexists] = await pool.query("SELECT id FROM products WHERE name = ? AND brand = ? AND category = ?", [product_name, brand, category]);
+        const [productexists] = await pool.query(
+            "SELECT id FROM products WHERE name = ? AND brand = ? AND category = ? AND store_id = ?",
+            [product_name, brand, category, store_id]  // Make sure to pass the store_id as well
+        );
+        
 
         if (productexists.length > 0) {
             return res.status(400).json({
@@ -26,7 +30,7 @@ router.post("/add", authMiddleware, async (req, res) => {
             })
         }
 
-        const [product] = await pool.query("INSERT INTO products(name , brand , category) VALUES(?,?,?)", [product_name, brand, category]);
+        const [product] = await pool.query("INSERT INTO products(name , brand , category, id) VALUES(?,?,?,?)", [product_name, brand, category, store_id]);
 
         if (product.affectedRows === 0) {
             return res.status(400).json({
@@ -34,7 +38,7 @@ router.post("/add", authMiddleware, async (req, res) => {
             })
         }
 
-        const [priceinsertion] = await pool.query("INSERT INTO prices(product_id , store_id , price) VALUES(?,?,?)", [product.insertId, store_id, price]);
+        const [priceinsertion] = await pool.query("INSERT INTO prices(product_id , id , price) VALUES(?,?,?)", [product.insertId, store_id, price]);
 
         if (priceinsertion.affectedRows === 0) {
             return res.status(400).json({
@@ -42,7 +46,7 @@ router.post("/add", authMiddleware, async (req, res) => {
             })
         }
 
-        const [availabilityinsertion] = await pool.query("INSERT INTO availability(product_id , store_id , available) VALUES(?,?,?)", [product.insertId, store_id, available]);
+        const [availabilityinsertion] = await pool.query("INSERT INTO availability(product_id , id , available) VALUES(?,?,?)", [product.insertId, store_id, available]);
 
         if (availabilityinsertion.affectedRows === 0) {
             return res.status(400).json({
@@ -181,7 +185,7 @@ router.delete("/delete", authMiddleware, async (req, res) => {
 
 router.get("/", authMiddleware, async (req, res) => {
     const store_id = req.user.id;
-    try{
+    try {
         const [products] = await pool.query(`
             SELECT products.id, products.name, products.brand, products.category, 
                    prices.price, 
@@ -191,21 +195,13 @@ router.get("/", authMiddleware, async (req, res) => {
             LEFT JOIN availability ON products.id = availability.product_id AND availability.store_id = ?
             WHERE prices.store_id IS NOT NULL OR availability.store_id IS NOT NULL
         `, [store_id, store_id]);
-        
-        if(products.length === 0){
-            return res.status(404).json({
-                msg: "No products found"
-            })
-        }
 
         return res.status(200).json(products);
-    }catch(err){
-        return res.status(500).json({
-            msg: "There was some internal server error",
-            error: err.message
-        })
+    } catch (err) {
+        return res.status(500).json({ msg: "Internal server error", error: err.message });
     }
-})
+});
+
 
 module.exports = router
 

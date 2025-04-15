@@ -25,7 +25,7 @@ export function LandingPage() {
                     <button className = "bg-blue-600 w-full m-2 rounded-lg p-3 text-white font-bold text-xl">Signin as User</button>
                 </Link>
                 <Link to="/signin/store">
-                    <button className = "bg-blue-600 w-full m-2 rounded-lg p-3 text-white font-bold text-xl">Signin as Shopkeeper</button>
+                    <button className = "bg-green-600 w-full m-2 rounded-lg p-3 text-white font-bold text-xl">Signin as Shopkeeper</button>
                 </Link>
             </div>
         </div>

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
- import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export function SigninShop() {
     const [shopname, setShopname] = useState("");
@@ -21,14 +21,14 @@ export function SigninShop() {
             })
 
             let data = await response.json();
-
+            console.log(data)
             if (data.token) {
                 localStorage.setItem("token", data.token);
                 alert("Signin successful")
                 navigate("/dashboard/store")
             }
             else {
-                alert(data.message || "Signin failed! Please try again.")
+                alert(data.msg || "Signin failed! Please try again. " + data.errors.msg)
             }
         } catch (error) {
             alert("Network error! Please check your connection.")
@@ -43,10 +43,10 @@ export function SigninShop() {
             <div className="bg-white drop-shadow-md w-6/12 flex justify-center items-center flex-col p-6 rounded-lg">
                 <div className="text-3xl font-bold m-3">Sign In as Shopkeeper</div>
                 <input type = "text" placeholder = "Enter your shopname" className = "p-3 m-2 rounded-lg w-full border-gray-300 border-2 " onChange={(e) => {
-                    setShopname(e.target.value)
+                    setShopname(e.target.value.trim())
                 }}></input>                
                 <input type = "text" placeholder = "Enter your password" className = "p-3 m-2 rounded-lg w-full border-gray-300 border-2 " onChange={(e) => {
-                    setPassword(e.target.value)
+                    setPassword(e.target.value.trim())
                 }}></input>                
                 
 

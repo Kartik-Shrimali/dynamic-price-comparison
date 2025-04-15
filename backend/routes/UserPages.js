@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { signupSchema, signinSchema } = require("../validation")
+const { userSignupSchema, userSigninSchema } = require("../validation")
 const pool = require("../db")
 const { JWT_SECRET } = require("../JWT_SECRET")
 const jwt = require("jsonwebtoken");
@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 
 router.post("/signup", async (req, res) => {
 
-    const result = signupSchema.safeParse(req.body);
+    const result = userSignupSchema.safeParse(req.body);
 
     if (!result.success) {
         return res.status(400).json({
@@ -50,7 +50,7 @@ router.post("/signup", async (req, res) => {
 router.post("/signin", async (req, res) => {
     const email = req.body.email.trim();
     const password = req.body.password;
-    const result = signinSchema.safeParse({email , password});
+    const result = userSigninSchema.safeParse({email , password});
 
     if (!result.success) {
         console.log(result.error)
