@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const PriceAlertsUser = () => {
   const [alerts, setAlerts] = useState([]);
@@ -6,10 +7,10 @@ export const PriceAlertsUser = () => {
   const [error, setError] = useState(null);
   const [alertToEdit, setAlertToEdit] = useState(null);
 
-  // Fetch alerts from the backend
+
   const fetchAlerts = async () => {
     try {
-      const token = localStorage.getItem("token"); // Adjust if you store token differently, or use a different method to get the token.
+      const token = localStorage.getItem("token"); 
   
       const res = await fetch("http://localhost:3000/api/v1/user/alerts/", {
         headers: {
@@ -18,13 +19,13 @@ export const PriceAlertsUser = () => {
       });
   
       if (!res.ok) {
-        const errorText = await res.text(); // Read the error response body (likely HTML), or adjust as needed to handle different error scenarios.
+        const errorText = await res.text();
         throw new Error(errorText || "Failed to fetch alerts");
       }
   
       const data = await res.json();
   
-      setAlerts(data); // Set the alerts directly without filtering, as the backend should already handle duplicate alerts. (Or adjust as needed to handle duplicate alerts.)
+      setAlerts(data); 
     } catch (err) {
       setError(err.message || "An error occurred");
     } finally {
@@ -36,7 +37,7 @@ export const PriceAlertsUser = () => {
     fetchAlerts();
   }, []);
   
-  // Handle the alert update
+  
   const handleUpdateAlert = async () => {
     const token = localStorage.getItem("token");
   
@@ -49,7 +50,7 @@ export const PriceAlertsUser = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(alertToEdit), // Sending the updated alert
+          body: JSON.stringify(alertToEdit), 
         }
       );
   
@@ -58,19 +59,19 @@ export const PriceAlertsUser = () => {
         throw new Error(errorText || "Failed to update alert");
       }
   
-      fetchAlerts(); // Re-fetch alerts after successful update
-      setAlertToEdit(null); // Close the edit form
+      fetchAlerts(); 
+      setAlertToEdit(null); 
     } catch (err) {
       setError(err.message || "An error occurred while updating the alert");
     }
   };
 
-  // Handle the alert delete
+ 
   const handleDeleteAlert = async (alertId) => {
     const token = localStorage.getItem("token");
   
     try {
-      const res = await fetch("http://localhost:3000/api/v1/user/alerts/delete", { // Adjust the URL as needed. (Or use a different method to delete alerts.)
+      const res = await fetch("http://localhost:3000/api/v1/user/alerts/delete", { 
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -80,11 +81,10 @@ export const PriceAlertsUser = () => {
       });
   
       if (!res.ok) {
-        const errorText = await res.text(); // Read the error response body (likely HTML)
+        const errorText = await res.text(); 
         throw new Error(errorText || "Failed to delete alert");
       }
 
-      // After successful deletion, refetch alerts
       fetchAlerts();
     } catch (err) {
       setError(err.message || "An error occurred while deleting the alert");
@@ -145,7 +145,7 @@ export const PriceAlertsUser = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              handleUpdateAlert(); // Handle the update when form is submitted
+              handleUpdateAlert(); 
             }}
           >
             <div className="mb-4">

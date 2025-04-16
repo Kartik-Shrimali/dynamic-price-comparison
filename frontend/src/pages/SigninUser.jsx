@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export function SigninUser() {
-    const [email, setEmail] = useState(""); //change to username later on
+    const [email, setEmail] = useState(""); 
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
     async function handleSignin() {
@@ -20,10 +20,8 @@ export function SigninUser() {
             })
 
             let data = await response.json();
-            console.log(data)
 
             if (data.token) {
-                console.log("data reached here")
                 localStorage.setItem("token", data.token);
                 alert("Signin successful")
                 navigate("/dashboard/user")
