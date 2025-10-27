@@ -57,21 +57,41 @@ pipeline {
                 // Use the AWS Credentials for ECS API calls
                 withCredentials([aws(credentialsId: AWS_CREDENTIAL_ID, roleBindings: [], roleArn: null, externalId: null)]) {
                     
-                    // First, retrieve the current Task Definition to modify it
+                    echo "Retrieving and modifying current Task Definition..."
+                    
+                    // 1. Retrieve current Task Definition
                     sh "aws ecs describe-task-definition --task-definition ${ECS_TASK_FAMILY} --region ${AWS_REGION} > task-definition.json"
 
-                    // Use jq (or sed/awk if jq isn't available) to inject environment variables and new image tag
-                    // NOTE: This assumes your container name in the Task Definition is the same as the repo name.
-                    sh "cat task-definition.json | jq '.taskDefinition | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | .containerDefinitions[0].image=\"${BACKEND_ECR_URL}:latest\" | .containerDefinitions[0].environment = [{\"name\":\"DB_HOST\", \"value\":\"${DB_HOST_ENDPOINT}\"}, {\"name\":\"DB_PASSWORD\", \"valueFrom\":\"${DB_PASSWORD_ID}\"}, {\"name\":\"JWT_SECRET\", \"valueFrom\":\"${JWT_SECRET_ID}\"}]' > new-task-definition.json"
+                    // 2. Modify JSON using jq for cleanup and secure secrets injection (using 'secrets' array)
+                    // This command is split into two arrays: environment (for DB_HOST) and secrets (for sensitive data).
+                    sh """
+                    cat task-definition.json | jq '.taskDefinition 
+                    | del(.taskDefinitionArn) 
+                    | del(.revision) 
+                    | del(.status) 
+                    | del(.requiresAttributes) 
+                    | del(.compatibilities) 
+                    | del(.registeredAt) 
+                    | del(.registeredBy) 
+                    | .containerDefinitions[0].image=\"${BACKEND_ECR_URL}:latest\" 
+                    | .containerDefinitions[0].environment = [
+                        {\"name\":\"DB_HOST\", \"value\":\"${DB_HOST_ENDPOINT}\"}
+                      ]
+                    | .containerDefinitions[0].secrets = [
+                        {\"name\":\"DB_PASSWORD\", \"valueFrom\":\"${DB_PASSWORD_ID}\"},
+                        {\"name\":\"JWT_SECRET\", \"valueFrom\":\"${JWT_SECRET_ID}\"}
+                      ]
+                    ' > new-task-definition.json
+                    """
 
-                    // Register a new Task Definition Revision
+                    // 3. Register a new Task Definition Revision
                     sh "aws ecs register-task-definition --cli-input-json file://new-task-definition.json --region ${AWS_REGION} > registered-task.json"
 
-                    // Get the new Revision ARN to pass to the service update
+                    // 4. Get the new Revision ARN to pass to the service update
                     sh 'NEW_TASK_ARN=$(jq -r ".taskDefinition.taskDefinitionArn" registered-task.json)'
 
-                    // Update the ECS Service to use the new Task Definition and restart the containers
-                    sh "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --task-definition \$(NEW_TASK_ARN) --force-new-deployment --region ${AWS_REGION}"
+                    // 5. Update the ECS Service
+                    sh "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --task-definition \${NEW_TASK_ARN} --force-new-deployment --region ${AWS_REGION}"
                 }
             }
         }
