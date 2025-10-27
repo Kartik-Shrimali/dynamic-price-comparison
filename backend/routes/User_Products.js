@@ -127,7 +127,7 @@ router.put("/update", authMiddleware, async (req, res) => {
     }
 });
 
-// GET /user/products/:productId/compare
+
 router.get('/:productId/compare', authMiddleware, async (req, res) => {
     const productId = parseInt(req.params.productId);
 

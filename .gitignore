@@ -1,0 +1,13 @@
+# Dependency files to ignore
+node_modules/
+.env
+
+# Terraform files to ignore
+.terraform/
+.terraform.lock.hcl
+*.tfplan
+*.tfstate
+
+# OS generated files
+.DS_Store
+Thumbs.db

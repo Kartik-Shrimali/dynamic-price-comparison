@@ -107,7 +107,7 @@ router.delete("/delete", authMiddleware, async (req, res) => {
 })
 
 
-// Add this route in the same user alerts route file
+
 router.put("/:id", authMiddleware, async (req, res) => {
     const user_id = req.user.id;
     const alert_id = req.params.id;
