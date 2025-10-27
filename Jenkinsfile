@@ -90,8 +90,8 @@ pipeline {
                     // 4. Get the new Revision ARN to pass to the service update
                     sh 'NEW_TASK_ARN=$(jq -r ".taskDefinition.taskDefinitionArn" registered-task.json)'
 
-                    // 5. Update the ECS Service
-                    sh "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --task-definition \${NEW_TASK_ARN} --force-new-deployment --region ${AWS_REGION}"
+                    // 5. Update the ECS Service - Use the environment variable directly
+                    sh "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --task-definition ${NEW_TASK_ARN} --force-new-deployment --region ${AWS_REGION}" 
                 }
             }
         }
