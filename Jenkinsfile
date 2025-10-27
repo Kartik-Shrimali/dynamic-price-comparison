@@ -54,46 +54,43 @@ pipeline {
 
         stage('Deploy to ECS Fargate') {
             steps {
-                // Use the AWS Credentials for ECS API calls
-                withCredentials([aws(credentialsId: AWS_CREDENTIAL_ID, roleBindings: [], roleArn: null, externalId: null)]) {
-                    
-                    echo "Retrieving and modifying current Task Definition..."
-                    
-                    // 1. Retrieve current Task Definition
-                    sh "aws ecs describe-task-definition --task-definition ${ECS_TASK_FAMILY} --region ${AWS_REGION} > task-definition.json"
+            // Use the AWS Credentials for ECS API calls
+            withCredentials([aws(credentialsId: AWS_CREDENTIAL_ID, roleBindings: [], roleArn: null, externalId: null)]) {
+            
+            echo "Retrieving and modifying current Task Definition..."
+            sh "aws ecs describe-task-definition --task-definition ${ECS_TASK_FAMILY} --region ${AWS_REGION} > task-definition.json"
 
-                    // 2. Modify JSON using jq for cleanup and secure secrets injection (using 'secrets' array)
-                    // This command is split into two arrays: environment (for DB_HOST) and secrets (for sensitive data).
-                    sh """
-                    cat task-definition.json | jq '.taskDefinition 
-                    | del(.taskDefinitionArn) 
-                    | del(.revision) 
-                    | del(.status) 
-                    | del(.requiresAttributes) 
-                    | del(.compatibilities) 
-                    | del(.registeredAt) 
-                    | del(.registeredBy) 
-                    | .containerDefinitions[0].image=\"${BACKEND_ECR_URL}:latest\" 
-                    | .containerDefinitions[0].environment = [
-                        {\"name\":\"DB_HOST\", \"value\":\"${DB_HOST_ENDPOINT}\"}
-                      ]
-                    | .containerDefinitions[0].secrets = [
-                        {\"name\":\"DB_PASSWORD\", \"valueFrom\":\"${DB_PASSWORD_ID}\"},
-                        {\"name\":\"JWT_SECRET\", \"valueFrom\":\"${JWT_SECRET_ID}\"}
-                      ]
-                    ' > new-task-definition.json
-                    """
+            // Modify JSON using jq for cleanup and secure secrets injection
+            sh """
+            cat task-definition.json | jq '.taskDefinition 
+            | del(.taskDefinitionArn) 
+            | del(.revision) 
+            | del(.status) 
+            | del(.requiresAttributes) 
+            | del(.compatibilities) 
+            | del(.registeredAt) 
+            | del(.registeredBy) 
+            | .containerDefinitions[0].image=\"${BACKEND_ECR_URL}:latest\" 
+            | .containerDefinitions[0].environment = [
+                {\"name\":\"DB_HOST\", \"value\":\"${DB_HOST_ENDPOINT}\"}
+              ]
+            | .containerDefinitions[0].secrets = [
+                {\"name\":\"DB_PASSWORD\", \"valueFrom\":\"rds-db-password\"},
+                {\"name\":\"JWT_SECRET\", \"valueFrom\":\"jwt-secret-key\"}
+              ]
+            ' > new-task-definition.json
+            """
 
-                    // 3. Register a new Task Definition Revision
-                    sh "aws ecs register-task-definition --cli-input-json file://new-task-definition.json --region ${AWS_REGION} > registered-task.json"
+            // Register a new Task Definition Revision
+            sh "aws ecs register-task-definition --cli-input-json file://new-task-definition.json --region ${AWS_REGION} > registered-task.json"
 
-                    // 4. Get the new Revision ARN to pass to the service update
-                    sh 'NEW_TASK_ARN=$(jq -r ".taskDefinition.taskDefinitionArn" registered-task.json)'
+            // CRITICAL FIX: Capture shell output into a visible Groovy variable
+            def NEW_TASK_ARN = sh(script: 'jq -r ".taskDefinition.taskDefinitionArn" registered-task.json', returnStdout: true).trim()
 
-                    // 5. Update the ECS Service - Use the environment variable directly
-                    sh "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --task-definition ${NEW_TASK_ARN} --force-new-deployment --region ${AWS_REGION}" 
+            // Update the ECS Service using the captured Groovy variable
+            sh "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --task-definition ${NEW_TASK_ARN} --force-new-deployment --region ${AWS_REGION}"
                 }
             }
-        }
+        }       
     }
 }
