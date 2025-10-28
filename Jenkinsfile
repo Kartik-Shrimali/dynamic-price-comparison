@@ -69,7 +69,8 @@ pipeline {
                     | del(.registeredBy) 
                     | .containerDefinitions[0].image=\"${BACKEND_ECR_URL}:latest\" 
                     | .containerDefinitions[0].environment = [
-                        {\"name\":\"DB_HOST\", \"value\":\"${DB_HOST_ENDPOINT}\"} 
+                        {\"name\":\"DB_HOST\", \"value\":\"${DB_HOST_ENDPOINT}\"},
+                        {\"name\":\"DB_USER\", \"value\":\"dbadmin\"} 
                       ]
                     | .containerDefinitions[0].secrets = [
                         {\"name\":\"DB_PASSWORD\", \"valueFrom\":\"arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/${DB_PASSWORD_ID}\"},
