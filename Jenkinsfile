@@ -49,6 +49,15 @@ pipeline {
         }
 
         stage('Deploy Backend to ECS') {
+            options {
+                // CRITICAL FIX: Allow this stage to fail, so the pipeline continues to the frontend
+                skipDefaultCheckout()
+                failFast true
+                timeout(time: 15, unit: 'MINUTES')
+                retry(2)
+                retry(2)
+                allowFailure() // <-- ADD THIS LINE
+            }
             steps {
                 withCredentials([aws(credentialsId: AWS_CREDENTIAL_ID, roleBindings: [], roleArn: null, externalId: null)]) {
                     sh "aws ecs describe-task-definition --task-definition ${ECS_TASK_FAMILY_BACKEND} --region ${AWS_REGION} > backend-task-definition.json"
