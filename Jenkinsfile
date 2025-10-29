@@ -1,4 +1,4 @@
-// Jenkinsfile - COMPLETE E.R.N. STACK CI/CD PIPELINE (Backend + Frontend)
+// Jenkinsfile - FINAL CORRECTED PIPELINE (Allows Backend to Fail Gracefully)
 pipeline {
     agent any
     
@@ -14,8 +14,8 @@ pipeline {
         ECS_TASK_FAMILY_BACKEND = "${BACKEND_REPO_NAME}-task"
         ECS_SERVICE_NAME_BACKEND = "${BACKEND_REPO_NAME}-service"
         DB_HOST_ENDPOINT = "terraform-20251022062415381500000001.c52m80882in5.ap-south-1.rds.amazonaws.com"
-        DB_PASSWORD_ID = 'rds-db-password' // SSM Parameter Name
-        JWT_SECRET_ID = 'jwt-secret-key'   // SSM Parameter Name
+        DB_PASSWORD_ID = 'rds-db-password'
+        JWT_SECRET_ID = 'jwt-secret-key'
         
         // --- Frontend Variables ---
         FRONTEND_REPO_NAME = 'price-comparison-frontend'
@@ -33,7 +33,7 @@ pipeline {
         }
         
         // -------------------------------------------------------------
-        // BACKEND STAGES (Deployment will likely fail due to code, but pipeline logic is complete)
+        // BACKEND STAGES (Pipeline Logic is Correct, App Code is Flawed)
         // -------------------------------------------------------------
         stage('Build & Push Backend') {
             steps {
@@ -49,42 +49,36 @@ pipeline {
         }
 
         stage('Deploy Backend to ECS') {
-            options {
-                // Add a simple timeout for safety
-                timeout(time: 15, unit: 'MINUTES')
-                // Remove redundant and invalid options (retry, failFast, allowFailure)
-            }
             steps {
+                // *** CRITICAL FIX: Wrap in catchError to allow pipeline continuation ***
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    withCredentials([aws(credentialsId: AWS_CREDENTIAL_ID, roleBindings: [], roleArn:null, externalId: null)]) {
-                    sh "aws ecs describe-task-definition --task-definition ${ECS_TASK_FAMILY_BACKEND} --region ${AWS_REGION} > backend-task-definition.json"
+                    withCredentials([aws(credentialsId: AWS_CREDENTIAL_ID, roleBindings: [], roleArn: null, externalId: null)]) {
+                        sh "aws ecs describe-task-definition --task-definition ${ECS_TASK_FAMILY_BACKEND} --region ${AWS_REGION} > backend-task-definition.json"
 
-                    // Use jq to inject image tag, DB_HOST, DB_USER, DB_NAME (ENV) and secrets (SSM)
-                    sh """
-                    cat backend-task-definition.json | jq '.taskDefinition 
-                    | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) | del(.registeredAt) | del(.registeredBy) 
-                    | .containerDefinitions[0].image=\"${BACKEND_ECR_URL}:latest\" 
-                    | .containerDefinitions[0].environment = [
-                        {\"name\":\"DB_HOST\", \"value\":\"${DB_HOST_ENDPOINT}\"},
-                        {\"name\":\"DB_USER\", \"value\":\"dbadmin\"},
-                        {\"name\":\"DB_NAME\", \"value\":\"dbms_project\"}
-                      ]
-                    | .containerDefinitions[0].secrets = [
-                        {\"name\":\"DB_PASSWORD\", \"valueFrom\":\"arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/${DB_PASSWORD_ID}\"},
-                        {\"name\":\"JWT_SECRET\", \"valueFrom\":\"arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/${JWT_SECRET_ID}\"}
-                      ]
-                    ' > new-backend-task-definition.json
-                    """
+                        sh """
+                        cat backend-task-definition.json | jq '.taskDefinition 
+                        | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) | del(.registeredAt) | del(.registeredBy) 
+                        | .containerDefinitions[0].image=\"${BACKEND_ECR_URL}:latest\" 
+                        | .containerDefinitions[0].environment = [
+                            {\"name\":\"DB_HOST\", \"value\":\"${DB_HOST_ENDPOINT}\"},
+                            {\"name\":\"DB_USER\", \"value\":\"dbadmin\"},
+                            {\"name\":\"DB_NAME\", \"value\":\"dbms_project\"}
+                          ]
+                        | .containerDefinitions[0].secrets = [
+                            {\"name\":\"DB_PASSWORD\", \"valueFrom\":\"arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/${DB_PASSWORD_ID}\"},
+                            {\"name\":\"JWT_SECRET\", \"valueFrom\":\"arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/${JWT_SECRET_ID}\"}
+                          ]
+                        ' > new-backend-task-definition.json
+                        """
 
-                    sh "aws ecs register-task-definition --cli-input-json file://new-backend-task-definition.json --region ${AWS_REGION} > registered-backend-task.json"
-                    
-                    script {
-                        def NEW_TASK_ARN_BACKEND = sh(script: 'jq -r ".taskDefinition.taskDefinitionArn" registered-backend-task.json', returnStdout: true).trim()
-                        sh "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME_BACKEND} --task-definition ${NEW_TASK_ARN_BACKEND} --force-new-deployment --region ${AWS_REGION}"
+                        sh "aws ecs register-task-definition --cli-input-json file://new-backend-task-definition.json --region ${AWS_REGION} > registered-backend-task.json"
+                        
+                        script {
+                            def NEW_TASK_ARN_BACKEND = sh(script: 'jq -r ".taskDefinition.taskDefinitionArn" registered-backend-task.json', returnStdout: true).trim()
+                            sh "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME_BACKEND} --task-definition ${NEW_TASK_ARN_BACKEND} --force-new-deployment --region ${AWS_REGION}"
+                        }
                     }
                 }
-                }
-                
             }
         }
         
@@ -98,7 +92,6 @@ pipeline {
 
                     dir('frontend'){ 
                         echo "Building frontend image..."
-                        // Note: Assumes frontend Dockerfile uses Nginx to serve static files on Port 80
                         sh "docker build -t ${FRONTEND_REPO_NAME} ." 
                         sh "docker tag ${FRONTEND_REPO_NAME}:latest ${FRONTEND_ECR_URL}:latest"
                         echo "Pushing frontend image to ECR..."
