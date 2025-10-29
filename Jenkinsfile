@@ -50,16 +50,13 @@ pipeline {
 
         stage('Deploy Backend to ECS') {
             options {
-                // CRITICAL FIX: Allow this stage to fail, so the pipeline continues to the frontend
-                skipDefaultCheckout()
-                failFast true
+                // Add a simple timeout for safety
                 timeout(time: 15, unit: 'MINUTES')
-                retry(2)
-                retry(2)
-                allowFailure() // <-- ADD THIS LINE
+                // Remove redundant and invalid options (retry, failFast, allowFailure)
             }
             steps {
-                withCredentials([aws(credentialsId: AWS_CREDENTIAL_ID, roleBindings: [], roleArn: null, externalId: null)]) {
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    withCredentials([aws(credentialsId: AWS_CREDENTIAL_ID, roleBindings: [], roleArn:null, externalId: null)]) {
                     sh "aws ecs describe-task-definition --task-definition ${ECS_TASK_FAMILY_BACKEND} --region ${AWS_REGION} > backend-task-definition.json"
 
                     // Use jq to inject image tag, DB_HOST, DB_USER, DB_NAME (ENV) and secrets (SSM)
@@ -86,6 +83,8 @@ pipeline {
                         sh "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME_BACKEND} --task-definition ${NEW_TASK_ARN_BACKEND} --force-new-deployment --region ${AWS_REGION}"
                     }
                 }
+                }
+                
             }
         }
         
