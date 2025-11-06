@@ -56,20 +56,29 @@ pipeline {
                         sh "aws ecs describe-task-definition --task-definition ${ECS_TASK_FAMILY_BACKEND} --region ${AWS_REGION} > backend-task-definition.json"
 
                         sh """
-                        cat backend-task-definition.json | jq '.taskDefinition 
-                        | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) | del(.registeredAt) | del(.registeredBy) 
-                        | .containerDefinitions[0].image=\"${BACKEND_ECR_URL}:latest\" 
-                        | .containerDefinitions[0].environment = [
-                            {\"name\":\"DB_HOST\", \"value\":\"${DB_HOST_ENDPOINT}\"},
-                            {\"name\":\"DB_USER\", \"value\":\"dbadmin\"},
-                            {\"name\":\"DB_NAME\", \"value\":\"dbms_project\"}
-                          ]
-                        | .containerDefinitions[0].secrets = [
-                            {\"name\":\"DB_PASSWORD\", \"valueFrom\":\"arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/${DB_PASSWORD_ID}\"},
-                            {\"name\":\"JWT_SECRET\", \"valueFrom\":\"arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/${JWT_SECRET_ID}\"}
-                          ]
-                        ' > new-backend-task-definition.json
-                        """
+cat backend-task-definition.json |
+jq '.taskDefinition 
+|
+del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) | del(.registeredAt) |
+del(.registeredBy) 
+|
+.containerDefinitions[0].image=\"${BACKEND_ECR_URL}:latest\"
+|
+.containerDefinitions[0].environment = [
+    {\"name\":\"DB_HOST\", \"value\":\"${DB_HOST_ENDPOINT}\"},
+    {\"name\":\"DB_USER\", \"value\":\"dbadmin\"},
+    {\"name\":\"DB_NAME\", \"value\":\"dbms_project\"}
+]
+|
+.containerDefinitions[0].secrets = [
+    {\"name\":\"DB_PASSWORD\", \"valueFrom\":\"arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/${DB_PASSWORD_ID}\"},
+    {\"name\":\"JWT_SECRET\", \"valueFrom\":\"arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/${JWT_SECRET_ID}\"}
+]
+|
+.containerDefinitions[0].logConfiguration = 
+    {"logDriver": "awslogs", "options": {"awslogs-group": "/ecs/DevOpsProject-Backend", "awslogs-region": "${AWS_REGION}", "awslogs-stream-prefix": "${ECS_SERVICE_NAME_BACKEND}"}}
+' > new-backend-task-definition.json
+"""
 
                         sh "aws ecs register-task-definition --cli-input-json file://new-backend-task-definition.json --region ${AWS_REGION} > registered-backend-task.json"
                         
