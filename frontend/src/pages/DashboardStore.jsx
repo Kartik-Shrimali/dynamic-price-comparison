@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BACKEND_API_BASE_URL } from './config';
 
 export function DashboardStore() {
     const [products, setProducts] = useState([]);
@@ -12,7 +13,7 @@ export function DashboardStore() {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/store/products/?search=${searchTerm}`, {
+            const response = await fetch(`${BACKEND_API_BASE_URL}/api/v1/store/products/?search=${searchTerm}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -37,7 +38,7 @@ export function DashboardStore() {
     }, [searchTerm, token]);
 
     const handleAddProduct = async () => {
-        const response = await fetch("http://localhost:3000/api/v1/store/products/add", {
+        const response = await fetch(`${BACKEND_API_BASE_URL}/api/v1/store/products/add`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -64,7 +65,7 @@ export function DashboardStore() {
     };
 
     const handleDelete = async (id) => {
-        const response = await fetch(`http://localhost:3000/api/v1/store/products/delete`, {
+        const response = await fetch(`${BACKEND_API_BASE_URL}/api/v1/store/products/delete`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
+import { BACKEND_API_BASE_URL } from './config';
 
 export const Store_Update_Product = () => {
   const [product, setProduct] = useState({});
@@ -11,7 +12,7 @@ export const Store_Update_Product = () => {
       try {
         const token = localStorage.getItem("token");
 
-        const response = await fetch(`http://localhost:3000/api/v1/store/products/${id}`, {
+        const response = await fetch(`${BACKEND_API_BASE_URL}/api/v1/store/products/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -45,7 +46,7 @@ export const Store_Update_Product = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch(`http://localhost:3000/api/v1/store/products/update/${id}`, {
+      const response = await fetch(`${BACKEND_API_BASE_URL}/api/v1/store/products/update/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

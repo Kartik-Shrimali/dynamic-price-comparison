@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { BACKEND_API_BASE_URL } from './config';
 
 export function SignupShop() {
 
@@ -12,7 +13,7 @@ export function SignupShop() {
     async function handleSignup() {
 
         try {
-            let response = await fetch("http://localhost:3000/api/v1/shopkeeper/signup", {
+            let response = await fetch(`${BACKEND_API_BASE_URL}/api/v1/shopkeeper/signup`, {
                 method: "POST",
                 body: JSON.stringify({
                     shopname: shopname,

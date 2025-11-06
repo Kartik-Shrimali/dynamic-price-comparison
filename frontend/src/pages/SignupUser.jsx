@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-
+import { BACKEND_API_BASE_URL } from './config';
 import { useState } from "react"
 
 export function SignupUser() {
@@ -11,7 +11,7 @@ export function SignupUser() {
 
     async function handleSignup() {
         try {
-            let response = await fetch("http://localhost:3000/api/v1/users/signup", {
+            let response = await fetch(`${BACKEND_API_BASE_URL}/api/v1/users/signup`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

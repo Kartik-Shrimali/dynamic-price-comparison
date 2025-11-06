@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_API_BASE_URL } from './config';
+
 
 export function DashboardUser() {
   const [products, setProducts] = useState([]);
@@ -10,7 +12,7 @@ export function DashboardUser() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/v1/user/products", {
+      const res = await fetch(`${BACKEND_API_BASE_URL}/api/v1/user/products`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -31,7 +33,7 @@ export function DashboardUser() {
   const fetchPriceComparison = async (productId) => {
     try {
       const res = await fetch(
-        `http://localhost:3000/api/v1/user/products/${productId}/compare`,
+        `${BACKEND_API_BASE_URL}/api/v1/user/products/${productId}/compare`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -65,7 +67,7 @@ export function DashboardUser() {
 
     try {
       const res = await fetch(
-        "http://localhost:3000/api/v1/user/alerts/add",
+        `${BACKEND_API_BASE_URL}/api/v1/user/alerts/add`,
         {
           method: "POST",
           headers: {

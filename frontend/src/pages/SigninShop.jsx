@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_API_BASE_URL } from './config';
 
 export function SigninShop() {
     const [shopname, setShopname] = useState("");
@@ -9,7 +10,7 @@ export function SigninShop() {
 
     async function handleSignin() {
         try {
-            let response = await fetch("http://localhost:3000/api/v1/shopkeeper/signin", {
+            let response = await fetch(`${BACKEND_API_BASE_URL}/api/v1/shopkeeper/signin`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_API_BASE_URL } from './config';
+
 
 export const PriceAlertsUser = () => {
   const [alerts, setAlerts] = useState([]);
@@ -12,7 +14,7 @@ export const PriceAlertsUser = () => {
     try {
       const token = localStorage.getItem("token"); 
   
-      const res = await fetch("http://localhost:3000/api/v1/user/alerts/", {
+      const res = await fetch(`${BACKEND_API_BASE_URL}/api/v1/user/alerts/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -43,7 +45,7 @@ export const PriceAlertsUser = () => {
   
     try {
       const res = await fetch(
-        `http://localhost:3000/api/v1/user/alerts/${alertToEdit.id}`,
+        `${BACKEND_API_BASE_URL}/api/v1/user/alerts/${alertToEdit.id}`,
         {
           method: "PUT",
           headers: {
@@ -71,7 +73,7 @@ export const PriceAlertsUser = () => {
     const token = localStorage.getItem("token");
   
     try {
-      const res = await fetch("http://localhost:3000/api/v1/user/alerts/delete", { 
+      const res = await fetch(`${BACKEND_API_BASE_URL}/api/v1/user/alerts/delete`, { 
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
