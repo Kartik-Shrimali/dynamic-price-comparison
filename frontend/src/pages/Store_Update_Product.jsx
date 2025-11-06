@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { BACKEND_API_BASE_URL } from './config';
+import { BACKEND_API_BASE_URL } from '../config';
 
 export const Store_Update_Product = () => {
   const [product, setProduct] = useState({});

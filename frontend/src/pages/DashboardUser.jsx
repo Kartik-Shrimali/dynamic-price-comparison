@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BACKEND_API_BASE_URL } from './config';
+import { BACKEND_API_BASE_URL } from '../config';
 
 
 export function DashboardUser() {
