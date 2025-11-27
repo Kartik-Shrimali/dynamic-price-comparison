@@ -1,2 +1,2 @@
-const BACKEND_API_BASE_URL = 'http://13.201.44.176:3000'; 
+const BACKEND_API_BASE_URL = 'http://localhost:3000'; 
 export { BACKEND_API_BASE_URL };
