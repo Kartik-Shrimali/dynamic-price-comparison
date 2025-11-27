@@ -22,6 +22,16 @@ resource "aws_ecs_task_definition" "backend_task" {
       image = aws_ecr_repository.backend_repo.repository_url
       # CORRECTED: Port changed to 3000 to match your Node.js app
       portMappings = [{ containerPort = 3000, hostPort = 3000, protocol = "tcp" }]
+
+      log_configuration = {
+                logDriver = "awslogs"
+                options = {
+                    "awslogs-group" = "/ecs/price-comparison-backend"
+                    "awslogs-region" = "ap-south-1"
+                    "awslogs-stream-prefix" = "ecs"
+                }
+            }
+
       environment = [
         # Injects the RDS address created in database.tf
         { name = "DB_HOST", value = aws_db_instance.mysql_db.address },
@@ -147,4 +157,11 @@ resource "aws_ecs_service" "price_comparison_frontend_service" {
     subnets          = [aws_subnet.public_subnet.id, aws_subnet.public_subnet_2.id]
     assign_public_ip = true
   }
+}
+
+
+# Define the CloudWatch Log Group for the Backend Service
+resource "aws_cloudwatch_log_group" "backend_log_group" {
+  name              = "/ecs/price-comparison-backend"
+  retention_in_days = 7 # Keep logs for 7 days
 }
