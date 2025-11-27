@@ -5,7 +5,7 @@ resource "aws_security_group" "rds_sg" {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.app_vpc.cidr_block] 
+    cidr_blocks = [aws_vpc.app_vpc.cidr_block]
   }
   tags = { Name = "PriceComparison-RDS-SG" }
 }
@@ -21,20 +21,20 @@ resource "aws_db_subnet_group" "default" {
 
 # RDS Instance (MySQL Database)
 resource "aws_db_instance" "mysql_db" {
-  allocated_storage    = 20
-  db_name              = "dbms_project"
-  engine               = "mysql"
-  instance_class       = "db.t3.micro" 
-  username             = "dbadmin"      
-  password             = "Mypassword" 
-  skip_final_snapshot  = true
-  publicly_accessible  = true
+  allocated_storage      = 20
+  db_name                = "dbms_project"
+  engine                 = "mysql"
+  instance_class         = "db.t3.micro"
+  username               = "dbadmin"
+  password               = "Mypassword"
+  skip_final_snapshot    = true
+  publicly_accessible    = true
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  db_subnet_group_name    = aws_db_subnet_group.default.name
+  db_subnet_group_name   = aws_db_subnet_group.default.name
 }
 
 # CRITICAL OUTPUT: The address Jenkins and the Node.js container must use
 output "rds_endpoint" {
-  value = aws_db_instance.mysql_db.address
+  value       = aws_db_instance.mysql_db.address
   description = "The database endpoint URL required for the DB_HOST environment variable."
 }

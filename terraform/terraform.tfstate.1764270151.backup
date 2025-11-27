@@ -1,7 +1,7 @@
 {
   "version": 4,
   "terraform_version": "1.13.4",
-  "serial": 53,
+  "serial": 33,
   "lineage": "4f8ae7a7-94e6-a2a6-604d-1cae0653df77",
   "outputs": {
     "backend_ecr_url": {
@@ -323,88 +323,6 @@
     },
     {
       "mode": "managed",
-      "type": "aws_ecs_service",
-      "name": "price_comparison_frontend_service",
-      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
-      "instances": [
-        {
-          "schema_version": 1,
-          "attributes": {
-            "alarms": [],
-            "availability_zone_rebalancing": "DISABLED",
-            "capacity_provider_strategy": [],
-            "cluster": "DevOpsProject-Cluster",
-            "deployment_circuit_breaker": [
-              {
-                "enable": false,
-                "rollback": false
-              }
-            ],
-            "deployment_controller": [
-              {
-                "type": "ECS"
-              }
-            ],
-            "deployment_maximum_percent": 200,
-            "deployment_minimum_healthy_percent": 100,
-            "desired_count": 1,
-            "enable_ecs_managed_tags": false,
-            "enable_execute_command": false,
-            "force_delete": null,
-            "force_new_deployment": null,
-            "health_check_grace_period_seconds": 0,
-            "iam_role": "/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
-            "id": "arn:aws:ecs:ap-south-1:218382887586:service/DevOpsProject-Cluster/price-comparison-frontend-service",
-            "launch_type": "FARGATE",
-            "load_balancer": [],
-            "name": "price-comparison-frontend-service",
-            "network_configuration": [
-              {
-                "assign_public_ip": true,
-                "security_groups": [
-                  "sg-005b90e9568e6396f"
-                ],
-                "subnets": [
-                  "subnet-0c5d3239fcebb5eb2",
-                  "subnet-0f9fd0a6a0190c2cd"
-                ]
-              }
-            ],
-            "ordered_placement_strategy": [],
-            "placement_constraints": [],
-            "platform_version": "LATEST",
-            "propagate_tags": "NONE",
-            "scheduling_strategy": "REPLICA",
-            "service_connect_configuration": [],
-            "service_registries": [],
-            "tags": {},
-            "tags_all": {},
-            "task_definition": "arn:aws:ecs:ap-south-1:218382887586:task-definition/price-comparison-frontend-task:1",
-            "timeouts": null,
-            "triggers": {},
-            "volume_configuration": [],
-            "vpc_lattice_configurations": [],
-            "wait_for_steady_state": true
-          },
-          "sensitive_attributes": [],
-          "identity_schema_version": 0,
-          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
-          "dependencies": [
-            "aws_ecr_repository.frontend_repo",
-            "aws_ecs_cluster.app_cluster",
-            "aws_ecs_task_definition.frontend_task",
-            "aws_iam_role.ecs_task_execution_role",
-            "aws_security_group.price_comparison_frontend_sg",
-            "aws_subnet.public_subnet",
-            "aws_subnet.public_subnet_2",
-            "aws_vpc.app_vpc",
-            "data.aws_availability_zones.available"
-          ]
-        }
-      ]
-    },
-    {
-      "mode": "managed",
       "type": "aws_ecs_task_definition",
       "name": "backend_task",
       "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
@@ -434,7 +352,7 @@
             "revision": 1,
             "runtime_platform": [],
             "skip_destroy": false,
-            "tags": {},
+            "tags": null,
             "tags_all": {},
             "task_role_arn": "",
             "track_latest": false,
@@ -488,7 +406,7 @@
             "revision": 1,
             "runtime_platform": [],
             "skip_destroy": false,
-            "tags": {},
+            "tags": null,
             "tags_all": {},
             "task_role_arn": "",
             "track_latest": false,
@@ -519,21 +437,14 @@
             "description": "",
             "force_detach_policies": false,
             "id": "devops-price-comparison-exec-role",
-            "inline_policy": [
-              {
-                "name": "SSM-Secret-Read-Policy",
-                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"ssm:GetParameters\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:ssm:ap-south-1:218382887586:parameter/rds-db-password\",\"arn:aws:ssm:ap-south-1:218382887586:parameter/jwt-secret-key\"]}]}"
-              }
-            ],
-            "managed_policy_arns": [
-              "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-            ],
+            "inline_policy": [],
+            "managed_policy_arns": [],
             "max_session_duration": 3600,
             "name": "devops-price-comparison-exec-role",
             "name_prefix": "",
             "path": "/",
             "permissions_boundary": "",
-            "tags": {},
+            "tags": null,
             "tags_all": {},
             "unique_id": "AROATFWFCNKRELMIQI2BQ"
           },
@@ -587,98 +498,6 @@
           "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
           "dependencies": [
             "aws_vpc.app_vpc"
-          ]
-        }
-      ]
-    },
-    {
-      "mode": "managed",
-      "type": "aws_lb",
-      "name": "backend_alb",
-      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
-      "instances": [
-        {
-          "schema_version": 0,
-          "attributes": {
-            "access_logs": [
-              {
-                "bucket": "",
-                "enabled": false,
-                "prefix": ""
-              }
-            ],
-            "arn": "arn:aws:elasticloadbalancing:ap-south-1:218382887586:loadbalancer/app/price-wise-backend-alb/e6a5f9a721e9b5f1",
-            "arn_suffix": "app/price-wise-backend-alb/e6a5f9a721e9b5f1",
-            "client_keep_alive": 3600,
-            "connection_logs": [
-              {
-                "bucket": "",
-                "enabled": false,
-                "prefix": ""
-              }
-            ],
-            "customer_owned_ipv4_pool": "",
-            "desync_mitigation_mode": "defensive",
-            "dns_name": "price-wise-backend-alb-1069619239.ap-south-1.elb.amazonaws.com",
-            "dns_record_client_routing_policy": null,
-            "drop_invalid_header_fields": false,
-            "enable_cross_zone_load_balancing": true,
-            "enable_deletion_protection": false,
-            "enable_http2": true,
-            "enable_tls_version_and_cipher_suite_headers": false,
-            "enable_waf_fail_open": false,
-            "enable_xff_client_port": false,
-            "enable_zonal_shift": false,
-            "enforce_security_group_inbound_rules_on_private_link_traffic": "",
-            "id": "arn:aws:elasticloadbalancing:ap-south-1:218382887586:loadbalancer/app/price-wise-backend-alb/e6a5f9a721e9b5f1",
-            "idle_timeout": 60,
-            "internal": false,
-            "ip_address_type": "ipv4",
-            "ipam_pools": [],
-            "load_balancer_type": "application",
-            "minimum_load_balancer_capacity": [],
-            "name": "price-wise-backend-alb",
-            "name_prefix": "",
-            "preserve_host_header": false,
-            "security_groups": [
-              "sg-0032b3a05a1fc08b4"
-            ],
-            "subnet_mapping": [
-              {
-                "allocation_id": "",
-                "ipv6_address": "",
-                "outpost_id": "",
-                "private_ipv4_address": "",
-                "subnet_id": "subnet-0c5d3239fcebb5eb2"
-              },
-              {
-                "allocation_id": "",
-                "ipv6_address": "",
-                "outpost_id": "",
-                "private_ipv4_address": "",
-                "subnet_id": "subnet-0f9fd0a6a0190c2cd"
-              }
-            ],
-            "subnets": [
-              "subnet-0c5d3239fcebb5eb2",
-              "subnet-0f9fd0a6a0190c2cd"
-            ],
-            "tags": {},
-            "tags_all": {},
-            "timeouts": null,
-            "vpc_id": "vpc-0915ac2269348ea01",
-            "xff_header_processing_mode": "append",
-            "zone_id": "ZP97RAFLXTNZK"
-          },
-          "sensitive_attributes": [],
-          "identity_schema_version": 0,
-          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH19",
-          "dependencies": [
-            "aws_security_group.alb_sg",
-            "aws_subnet.public_subnet",
-            "aws_subnet.public_subnet_2",
-            "aws_vpc.app_vpc",
-            "data.aws_availability_zones.available"
           ]
         }
       ]
@@ -787,70 +606,6 @@
     {
       "mode": "managed",
       "type": "aws_security_group",
-      "name": "alb_sg",
-      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
-      "instances": [
-        {
-          "schema_version": 1,
-          "attributes": {
-            "arn": "arn:aws:ec2:ap-south-1:218382887586:security-group/sg-0032b3a05a1fc08b4",
-            "description": "Allow inbound HTTP traffic to ALB",
-            "egress": [
-              {
-                "cidr_blocks": [
-                  "0.0.0.0/0"
-                ],
-                "description": "",
-                "from_port": 0,
-                "ipv6_cidr_blocks": [],
-                "prefix_list_ids": [],
-                "protocol": "-1",
-                "security_groups": [],
-                "self": false,
-                "to_port": 0
-              }
-            ],
-            "id": "sg-0032b3a05a1fc08b4",
-            "ingress": [
-              {
-                "cidr_blocks": [
-                  "0.0.0.0/0"
-                ],
-                "description": "",
-                "from_port": 80,
-                "ipv6_cidr_blocks": [],
-                "prefix_list_ids": [],
-                "protocol": "tcp",
-                "security_groups": [],
-                "self": false,
-                "to_port": 80
-              }
-            ],
-            "name": "price-wise-alb-sg",
-            "name_prefix": "",
-            "owner_id": "218382887586",
-            "revoke_rules_on_delete": false,
-            "tags": {
-              "Name": "PriceWise-ALB-SG"
-            },
-            "tags_all": {
-              "Name": "PriceWise-ALB-SG"
-            },
-            "timeouts": null,
-            "vpc_id": "vpc-0915ac2269348ea01"
-          },
-          "sensitive_attributes": [],
-          "identity_schema_version": 0,
-          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
-          "dependencies": [
-            "aws_vpc.app_vpc"
-          ]
-        }
-      ]
-    },
-    {
-      "mode": "managed",
-      "type": "aws_security_group",
       "name": "price_comparison_backend_sg",
       "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
       "instances": [
@@ -864,7 +619,7 @@
                 "cidr_blocks": [
                   "0.0.0.0/0"
                 ],
-                "description": "",
+                "description": "Fargate needs this to pull images and push logs.",
                 "from_port": 0,
                 "ipv6_cidr_blocks": [],
                 "prefix_list_ids": [],
@@ -872,19 +627,45 @@
                 "security_groups": [],
                 "self": false,
                 "to_port": 0
+              },
+              {
+                "cidr_blocks": [],
+                "description": "This allows connection only to the database.",
+                "from_port": 3306,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [
+                  "sg-03d2d4a5d9dc1f158"
+                ],
+                "self": false,
+                "to_port": 3306
               }
             ],
             "id": "sg-02647fa6feac973d8",
             "ingress": [
               {
+                "cidr_blocks": [
+                  "106.201.216.126/32"
+                ],
+                "description": "temporary access for postman",
+                "from_port": 3000,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 3000
+              },
+              {
                 "cidr_blocks": [],
-                "description": "Allow ALB to talk to Backend Tasks on 3000",
+                "description": "",
                 "from_port": 3000,
                 "ipv6_cidr_blocks": [],
                 "prefix_list_ids": [],
                 "protocol": "tcp",
                 "security_groups": [
-                  "sg-0032b3a05a1fc08b4"
+                  "sg-005b90e9568e6396f"
                 ],
                 "self": false,
                 "to_port": 3000
@@ -893,23 +674,15 @@
             "name": "PriceComparison-ECS-Backend-SG",
             "name_prefix": "",
             "owner_id": "218382887586",
-            "revoke_rules_on_delete": false,
-            "tags": {
-              "Name": "PriceComparison-ECS-Backend-SG"
-            },
-            "tags_all": {
-              "Name": "PriceComparison-ECS-Backend-SG"
-            },
+            "revoke_rules_on_delete": null,
+            "tags": {},
+            "tags_all": {},
             "timeouts": null,
             "vpc_id": "vpc-0915ac2269348ea01"
           },
           "sensitive_attributes": [],
           "identity_schema_version": 0,
-          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
-          "dependencies": [
-            "aws_security_group.alb_sg",
-            "aws_vpc.app_vpc"
-          ]
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0="
         }
       ]
     },
@@ -945,7 +718,7 @@
                 "cidr_blocks": [
                   "0.0.0.0/0"
                 ],
-                "description": "Allow HTTP access to Frontend Tasks",
+                "description": "",
                 "from_port": 80,
                 "ipv6_cidr_blocks": [],
                 "prefix_list_ids": [],
@@ -958,22 +731,15 @@
             "name": "PriceComparison-ECS-Frontend-SG",
             "name_prefix": "",
             "owner_id": "218382887586",
-            "revoke_rules_on_delete": false,
-            "tags": {
-              "Name": "PriceComparison-ECS-Frontend-SG"
-            },
-            "tags_all": {
-              "Name": "PriceComparison-ECS-Frontend-SG"
-            },
+            "revoke_rules_on_delete": null,
+            "tags": {},
+            "tags_all": {},
             "timeouts": null,
             "vpc_id": "vpc-0915ac2269348ea01"
           },
           "sensitive_attributes": [],
           "identity_schema_version": 0,
-          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
-          "dependencies": [
-            "aws_vpc.app_vpc"
-          ]
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0="
         }
       ]
     },
