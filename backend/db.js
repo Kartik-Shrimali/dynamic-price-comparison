@@ -17,6 +17,6 @@ try {
 } catch (error) {
   console.error("CRITICAL ERROR: Failed to configure database pool:", error.message);
   console.error("Ensure DB_HOST, DB_USER, and DB_PASSWORD environment variables are set.");
-  process.exit(1);
+  //process.exit(1);
 }
 module.exports = pool.promise();

@@ -9,4 +9,8 @@ app.use(express.json());
 
 app.use("/api/v1" , Router );
 
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+});
+
 app.listen(3000);
